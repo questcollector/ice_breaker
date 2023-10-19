@@ -6,10 +6,10 @@ def scrape_linkedin_profile(linkedin_profile_url: str):
     """scrape information from LinkedIn profiles,
     Manually scrape the information from the LinkedIn profile"""
 
-    use_gist = os.getenv("USE_GIST", default="True")
+    use_linkedin = os.getenv("USE_LINKEDIN", default="False")
     response = (
         _gist_scrape_linkedin_profile()
-        if use_gist == "True"
+        if use_linkedin == "False"
         else _real_scrape_linkedin_profile(linkedin_profile_url)
     )
 

@@ -3,7 +3,9 @@ from langchain.chat_models import ChatOpenAI
 from langchain.chains import LLMChain
 
 from third_parties.linkedin import scrape_linkedin_profile
+from third_parties.twitter import scrape_user_tweets
 from agents.linkedin_lookup_agent import lookup as linkedin_lookup_agent
+from agents.twitter_lookup_agent import lookup as twitter_lookup_agent
 
 # information = """
 # Elon Reeve Musk (/ˈiːlɒn/ EE-lon; born June 28, 1971) is a business magnate and investor. Musk is the founder, chairman, CEO and chief technology officer of SpaceX; angel investor, CEO, product architect and former chairman of Tesla, Inc.; owner, chairman and CTO of X Corp.; founder of the Boring Company; co-founder of Neuralink and OpenAI; and president of the Musk Foundation. He is the wealthiest person in the world, with an estimated net worth of US$232 billion as of September 2023, according to the Bloomberg Billionaires Index, and $253 billion according to Forbes, primarily from his ownership stakes in both Tesla and SpaceX.[5][6]
@@ -15,24 +17,30 @@ from agents.linkedin_lookup_agent import lookup as linkedin_lookup_agent
 # Musk has expressed views that have made him a polarizing figure. He has been criticized for making unscientific and misleading statements, including spreading COVID-19 misinformation and promoting conspiracy theories. His Twitter ownership has been similarly controversial, including laying off a large number of employees, an increase in hate speech on the platform, and changes to Twitter Blue verification. In 2018, the U.S. Securities and Exchange Commission (SEC) sued him for falsely tweeting that he had secured funding for a private takeover of Tesla. To settle the case, Musk stepped down as the chairman of Tesla and paid a $20 million fine.
 # """
 
+name = "eden marco udemy"
+
 if __name__ == "__main__":
     print("Hello LangChain")
 
+    linkedin_profile_url = linkedin_lookup_agent(name=name)
+    linkedin_data = scrape_linkedin_profile(linkedin_profile_url)
+
+    twitter_username = twitter_lookup_agent(name=name)
+    tweets = scrape_user_tweets(username=twitter_username, num_tweets=100)
+
     summary_template = """
-        given the information {information} about a person from I want you to create:
+        given the information {linkedin_information} and twitter {twitter_information} about a person from I want you to create:
         1. a short summary
         2. two interesting facts about them
     """
 
     summary_prompt_template = PromptTemplate(
-        input_variables=["information"], template=summary_template
+        input_variables=["linkedin_information", "twitter_information"],
+        template=summary_template,
     )
 
     llm = ChatOpenAI(temperature=0, model_name="gpt-3.5-turbo")
 
     chain = LLMChain(llm=llm, prompt=summary_prompt_template)
 
-    linkedin_profile_url = linkedin_lookup_agent(name="Eden Marco")
-    linkedin_data = scrape_linkedin_profile(linkedin_profile_url)
-
-    print(chain.run(information=linkedin_data))
+    print(chain.run(linkedin_information=linkedin_data, twitter_information=tweets))

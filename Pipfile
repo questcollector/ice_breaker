@@ -9,6 +9,7 @@ black = "*"
 openai = "*"
 requests = "*"
 google-search-results = "*"
+tweepy = "*"
 
 [dev-packages]
 
