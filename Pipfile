@@ -10,6 +10,8 @@ openai = "*"
 requests = "*"
 google-search-results = "*"
 tweepy = "*"
+flask = "*"
+python-dotenv = "*"
 
 [dev-packages]
 
