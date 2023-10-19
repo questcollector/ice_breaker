@@ -1,19 +1,21 @@
 import os
 import requests
+import json
+import pathlib
 
+linkedin_file = pathlib.Path(__file__).parent / "edens_linkedin.json"
 
 def scrape_linkedin_profile(linkedin_profile_url: str):
     """scrape information from LinkedIn profiles,
     Manually scrape the information from the LinkedIn profile"""
 
     use_linkedin = os.getenv("USE_LINKEDIN", default="False")
-    response = (
-        _gist_scrape_linkedin_profile()
+    data = (
+        _file_scrape_linkedin_profile(linkedin_file)
         if use_linkedin == "False"
         else _real_scrape_linkedin_profile(linkedin_profile_url)
     )
 
-    data = response.json()
     data = {
         k: v
         for k, v in data.items()
@@ -28,17 +30,16 @@ def scrape_linkedin_profile(linkedin_profile_url: str):
     return data
 
 
-def _real_scrape_linkedin_profile(linkedin_profile_url: str):
+def _real_scrape_linkedin_profile(linkedin_profile_url: str) -> dict:
     api_key = os.getenv("PROXYCURL_API_KEY")
     headers = {"Authorization": "Bearer " + api_key}
     api_endpoint = "https://nubela.co/proxycurl/api/v2/linkedin"
     params = {"url": linkedin_profile_url}
     response = requests.get(api_endpoint, params=params, headers=headers)
 
-    return response
+    return response.json()
 
 
-def _gist_scrape_linkedin_profile():
-    gist_profile_url = "https://gist.githubusercontent.com/emarco177/0d6a3f93dd06634d95e46a2782ed7490/raw/fad4d7a87e3e934ad52ba2a968bad9eb45128665/eden-marco.json"
-    response = requests.get(gist_profile_url)
-    return response
+def _file_scrape_linkedin_profile(linkedin_file: pathlib.Path) -> dict:
+    with linkedin_file.open("r") as f:
+        return json.load(f)
