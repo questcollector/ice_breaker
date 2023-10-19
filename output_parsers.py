@@ -5,7 +5,7 @@ from typing import List
 
 class PersonIntel(BaseModel):
     summary: str = Field(description="Summary of the person")
-    facts: str = Field(description="Interesting facts about the person")
+    facts: List[str] = Field(description="Interesting facts about the person")
     topics_of_interest: List[str] = Field(
         description="Topics that may interest the person"
     )
@@ -13,7 +13,7 @@ class PersonIntel(BaseModel):
         description="Create ice breakers to open a conversation with the person"
     )
 
-    def to_dicr(self):
+    def to_dict(self):
         return {
             "summary": self.summary,
             "facts": self.facts,
